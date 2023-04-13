@@ -37,9 +37,9 @@ function updateScore() {
 function displayResult(result, playerSelection, computerSelection) {
   let message;
   if (result === "win") {
-    message = `You win! ${playerSelection} beats ${computerSelection}.`;
+    message = `You win! Your ${playerSelection} beats computers ${computerSelection}!`;
   } else if (result === "lose") {
-    message = `You lose! ${computerSelection} beats ${playerSelection}.`;
+    message = `You lose! Computer picked ${computerSelection} and beats your ${playerSelection}!`;
   } else {
     message = `It's a draw! You both picked ${playerSelection}.`;
   }
@@ -75,7 +75,7 @@ async function game(playerSelection) {
     }
 
     hideBtns();
-    setTimeout(resetGame, 3000);
+    setTimeout(resetGame, 4000);
   } 
 
   updateScore();
@@ -123,5 +123,5 @@ function hideBtns() {
     rockBtn.style.visibility = "visible";
     paperBtn.style.visibility = "visible";
     scissorsBtn.style.visibility = "visible";
-  }, 3000);
+  }, 4000);
 }
