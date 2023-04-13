@@ -14,8 +14,6 @@ function computerPlay() {
 }
 
 
-
-
 function playRound(playerSelection, computerSelection) {
   if (playerSelection === computerSelection) {
     return "draw";
@@ -125,5 +123,5 @@ function hideBtns() {
     rockBtn.style.visibility = "visible";
     paperBtn.style.visibility = "visible";
     scissorsBtn.style.visibility = "visible";
-  }, 5000);
+  }, 3000);
 }
