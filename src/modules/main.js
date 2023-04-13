@@ -1,108 +1,110 @@
+import { user } from "./user.js";
+import { updateObject, getHighscore, displayHighscore } from "./firebase.js";
+
+
+let player;
 let playerScore = 0;
-let computerScore = 0;
+let playerName;
+let gameActive = true;
 
-const welcome = document.getElementById("welcome");
-document.getElementById("startBtn").addEventListener("click", () => {
-  event.preventDefault();
-  document.getElementById("welcome").innerHTML =
-    "Welcome, " + playerName + "! <br> Now, choose and let the game begin!";
-});
-
-const rockBtn = document.getElementById("rockBtn");
-rockBtn.addEventListener("click", () => {
-  event.preventDefault();
-  playGame("rock");
-});
-
-const paperBtn = document.getElementById("paperBtn");
-paperBtn.addEventListener("click", () => {
-  event.preventDefault();
-  playGame("paper");
-});
-
-const scissorsBtn = document.getElementById("scissorsBtn");
-scissorsBtn.addEventListener("click", () => {
-  event.preventDefault();
-  playGame("scissors");
-});
-
-function getRandomNumber() {
-  return Math.round(Math.random() * 2);
+function computerPlay() {
+  const choices = ["rock", "paper", "scissors"];
+  const randomIndex = Math.floor(Math.random() * choices.length);
+  return choices[randomIndex];
 }
 
-const result = document.getElementById("result");
-function playGame(playerChoice) {
-  let computerChoice = getRandomNumber();
-  if (computerChoice == 0) {
-    computerChoice = "rock";
-  } else if (computerChoice == 1) {
-    computerChoice = "paper";
-  } else {
-    computerChoice = "scissors";
+
+
+
+function playRound(playerSelection, computerSelection) {
+  if (playerSelection === computerSelection) {
+    return "draw";
   }
 
-  if (computerChoice == "rock") {
-    if (playerChoice == "rock") {
-      // result.innerHTML = "You chose " + playerChoice + " and computer chose " + computerChoice + ". <br> It's a tie!";
-    } else if (playerChoice == "paper") {
-      // result.innerHTML = "You chose " + playerChoice + " and computer chose " + computerChoice + ". <br> You win!";
-      playerScore++;
-    } else {
-      // result.innerHTML = "You chose " + playerChoice + " and computer chose " + computerChoice + ". <br> You lose!";
-      computerScore++;
-    }
-  } else if (computerChoice == "paper") {
-    if (playerChoice == "rock") {
-      // result.innerHTML = "You chose " + playerChoice + " and computer chose " + computerChoice + ". <br> You lose!";
-      computerScore++;
-    } else if (playerChoice == "paper") {
-      // result.innerHTML = "You chose " + playerChoice + " and computer chose " + computerChoice + ". <br> It's a tie!";
-    } else {
-      // result.innerHTML = "You chose " + playerChoice + " and computer chose " + computerChoice + ". <br> You win!";
-      playerScore++;
-    }
-  } else {
-    if (playerChoice == "rock") {
-      // result.innerHTML = "You chose " + playerChoice + " and computer chose " + computerChoice + ". <br> You win!";
-      playerScore++;
-    } else if (playerChoice == "paper") {
-      // result.innerHTML = "You chose " + playerChoice +  " and computer chose " + computerChoice + ". <br> You lose!";
-      computerScore++;
-    } else {
-      // result.innerHTML = "You chose " + playerChoice + " and computer chose " + computerChoice + ". <br> It's a tie!";
-    }
+  if (
+    (playerSelection === "rock" && computerSelection === "scissors") ||
+    (playerSelection === "scissors" && computerSelection === "paper") ||
+    (playerSelection === "paper" && computerSelection === "rock")
+  ) {
+    return "win";
   }
-  result.innerHTML =
-    "You chose " + playerChoice + " and computer chose " + computerChoice + + ". <br>" + winner;
 
-  const score = document.getElementById("score");
-  score.innerHTML =
-    playerName.value + " " + playerScore + " -  " + computerScore + " Computer";
-
-  if (playerScore == 3) {
-    const audioWin = new Audio("audio/winsound.mp4");
-    audioWin.play();
-    result.innerHTML =
-      "You chose " +
-      playerChoice +
-      " and computer chose " +
-      computerChoice +
-      ". <br> You win the game!";
-    hideBtns();
-    setTimeout(resetGame, 5000);
-  } else if (computerScore == 3) {
-    const audioLose = new Audio("audio/sadsound.mp4");
-    audioLose.play();
-    result.innerHTML =
-      "You chose " +
-      playerChoice +
-      " and computer chose " +
-      computerChoice +
-      ". <br> Computer wins the game!";
-    hideBtns();
-    setTimeout(resetGame, 5000);
-  }
+  return "lose";
 }
+
+function updateScore() {
+  document.getElementById("score").textContent = `Score: ${playerScore}`;
+}
+
+function displayResult(result, playerSelection, computerSelection) {
+  let message;
+  if (result === "win") {
+    message = `You win! ${playerSelection} beats ${computerSelection}.`;
+  } else if (result === "lose") {
+    message = `You lose! ${computerSelection} beats ${playerSelection}.`;
+  } else {
+    message = `It's a draw! You both picked ${playerSelection}.`;
+  }
+  document.getElementById("result").textContent = message;
+}
+
+async function game(playerSelection) {
+  console.log("Game function called:", playerSelection);
+
+  if (!gameActive) {
+    return;
+  }
+
+  if (!playerName) {
+    document.getElementById("result").textContent = "Please enter your name";
+    return;
+  }
+
+  const computerSelection = computerPlay();
+  console.log(computerSelection); 
+  const result = playRound(playerSelection, computerSelection);
+
+
+  if (result === "win") {
+    playerScore++;
+  } else if (result === "lose") {
+    gameActive = false;
+    player.setScore(playerScore);
+
+    if (playerScore > 0) {
+      await updateObject(player.getUsername(), player.getScore());
+      getHighscore().then((data) => displayHighscore(data));
+    }
+
+    hideBtns();
+    setTimeout(resetGame, 3000);
+  } 
+
+  updateScore();
+  displayResult(result, playerSelection, computerSelection);
+}
+
+
+
+
+document.getElementById("addInfo").addEventListener("submit", (event) => {
+  event.preventDefault();
+  playerName = document.getElementById("playerName").value.trim();
+  if (!playerName) {
+    document.getElementById("result").textContent = "Please enter your name";
+    return;
+  }
+  player = new user(playerName, 0);
+  document.getElementById("welcome").textContent = `Welcome, ${player.getUsername()}!`;
+  gameActive = true;
+});
+
+
+document.getElementById("rockBtn").addEventListener("click", () => game("rock"));
+document.getElementById("paperBtn").addEventListener("click", () => game("paper"));
+document.getElementById("scissorsBtn").addEventListener("click", () => game("scissors"));
+
+updateScore();
 
 function resetGame() {
   playerScore = 0;
@@ -114,10 +116,12 @@ function resetGame() {
 }
 
 function hideBtns() {
+  addInfo.style.visibility = "hidden";
   rockBtn.style.visibility = "hidden";
   paperBtn.style.visibility = "hidden";
   scissorsBtn.style.visibility = "hidden";
   setTimeout(() => {
+    addInfo.style.visibility = "visible";
     rockBtn.style.visibility = "visible";
     paperBtn.style.visibility = "visible";
     scissorsBtn.style.visibility = "visible";
