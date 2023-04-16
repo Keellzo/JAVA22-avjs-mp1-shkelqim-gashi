@@ -104,7 +104,7 @@ updateScore();
 
 function resetGame() {
   playerScore = 0;
-  playerName.value = "";
+  document.getElementById("playerName").value = "";
   welcome.innerHTML = "";
   result.innerHTML = "";
   score.innerHTML = "";
