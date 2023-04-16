@@ -47,7 +47,6 @@ function displayResult(result, playerSelection, computerSelection) {
 }
 
 async function game(playerSelection) {
-  console.log("Game function called:", playerSelection);
 
   if (!gameActive) {
     return;
@@ -59,7 +58,6 @@ async function game(playerSelection) {
   }
 
   const computerSelection = computerPlay();
-  console.log(computerSelection); 
   const result = playRound(playerSelection, computerSelection);
 
 
@@ -81,7 +79,6 @@ async function game(playerSelection) {
   updateScore();
   displayResult(result, playerSelection, computerSelection);
 }
-
 
 
 
