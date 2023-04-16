@@ -1,7 +1,6 @@
 import { user } from "./user.js";
 import { updateObject, getHighscore, displayHighscore } from "./firebase.js";
 
-
 let player;
 let playerScore = 0;
 let playerName;
@@ -12,7 +11,6 @@ function computerPlay() {
   const randomIndex = Math.floor(Math.random() * choices.length);
   return choices[randomIndex];
 }
-
 
 function playRound(playerSelection, computerSelection) {
   if (playerSelection === computerSelection) {
@@ -47,7 +45,6 @@ function displayResult(result, playerSelection, computerSelection) {
 }
 
 async function game(playerSelection) {
-
   if (!gameActive) {
     return;
   }
@@ -59,7 +56,6 @@ async function game(playerSelection) {
 
   const computerSelection = computerPlay();
   const result = playRound(playerSelection, computerSelection);
-
 
   if (result === "win") {
     playerScore++;
@@ -74,13 +70,11 @@ async function game(playerSelection) {
 
     hideBtns();
     setTimeout(resetGame, 4000);
-  } 
+  }
 
   updateScore();
   displayResult(result, playerSelection, computerSelection);
 }
-
-
 
 document.getElementById("addInfo").addEventListener("submit", (event) => {
   event.preventDefault();
@@ -90,14 +84,21 @@ document.getElementById("addInfo").addEventListener("submit", (event) => {
     return;
   }
   player = new user(playerName, 0);
-  document.getElementById("welcome").textContent = `Welcome, ${player.getUsername()}!`;
+  document.getElementById(
+    "welcome"
+  ).textContent = `Welcome, ${player.getUsername()}!`;
   gameActive = true;
 });
 
-
-document.getElementById("rockBtn").addEventListener("click", () => game("rock"));
-document.getElementById("paperBtn").addEventListener("click", () => game("paper"));
-document.getElementById("scissorsBtn").addEventListener("click", () => game("scissors"));
+document
+  .getElementById("rockBtn")
+  .addEventListener("click", () => game("rock"));
+document
+  .getElementById("paperBtn")
+  .addEventListener("click", () => game("paper"));
+document
+  .getElementById("scissorsBtn")
+  .addEventListener("click", () => game("scissors"));
 
 updateScore();
 

@@ -41,20 +41,22 @@ async function updateObject(name, score) {
     }
   }
 
-  const url = `https://highscore-1e03a-default-rtdb.europe-west1.firebasedatabase.app/highscore/${minScoreIndex}.json`;
-  const response = await fetch(url, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: name,
-      score: score,
-    }),
-  });
-  const updatedData = await response.json();
-  console.log(updatedData);
-  return updatedData;
+  if (score > minScore) {
+    const url = `https://highscore-1e03a-default-rtdb.europe-west1.firebasedatabase.app/highscore/${minScoreIndex}.json`;
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: name,
+        score: score,
+      }),
+    });
+    const updatedData = await response.json();
+    console.log(updatedData);
+    return updatedData;
+  }  
 }
 
 export { updateObject, getHighscore, displayHighscore };
